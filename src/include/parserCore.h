@@ -19,7 +19,7 @@ namespace parserTypes {
 class function;
 class condChild;
 class condAnd;
-class cond;
+class Cond;
 
 class ExecFunc;
 
@@ -27,11 +27,21 @@ class ptr;
 
 class expo;
 class term;
-class expr;
+class Expr;
 
 namespace value {
 class BaseValue;
 }
+namespace stmt {
+class BaseStmt;
+class BaseFor;
+class While;
+class If;
+class Mcl;
+class FuncDef;
+class Put;
+class Assign;
+}  // namespace stmt
 }  // namespace parserTypes
 
 class parserCore {
@@ -46,12 +56,14 @@ class parserCore {
   varsType variables;
   std::unordered_map<std::string, std::string> puts;
   std::unordered_map<std::string, parserTypes::function> functions;
+  std::vector<std::wstring> function_list;
   parserWrap *wraper;
 
   parserWrap *compiler;  // used for compile
   std::unordered_map<std::string, bool>
       puts_table;  // true,false = minecode,asm
 
+  std::wstring funcname = L"global";
   // function
 
   using Arg = std::pair<std::wstring, std::wstring>;
@@ -70,23 +82,23 @@ class parserCore {
   struct parserTypes::primary::BasePrimary &power();
   struct parserTypes::expo expo();
   struct parserTypes::term term();
-  struct parserTypes::expr expr();
+  struct parserTypes::Expr expr();
 
-  struct parserTypes::cond cond();
+  struct parserTypes::Cond cond();
   struct parserTypes::condAnd condAnd();
   struct parserTypes::condChild cond_inner();
 
   Range range();
 
   void program();
-  void stmt();
-  void func();
-  void If();
-  void For();
-  void While();
-  void put();
-  void assign();
-  void mcl();
+  parserTypes::stmt::BaseStmt &stmt();
+  parserTypes::stmt::FuncDef &func();
+  parserTypes::stmt::If &If();
+  parserTypes::stmt::BaseFor &For();
+  parserTypes::stmt::While &While();
+  parserTypes::stmt::Put &put();
+  parserTypes::stmt::Assign &assign();
+  parserTypes::stmt::Mcl &mcl();
 
   struct parserTypes::ExecFunc funcCall();
 };  // namespace parserWrap

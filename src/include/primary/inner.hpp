@@ -9,8 +9,7 @@ namespace primary {
 
 class Inner : public BasePrimary {
  public:
-  // TODO: restore name inner -> expr
-  expr inner;
+  Expr expr;
 
   void eval(parserCore& ctx, int dest) override;
 };

@@ -24,11 +24,11 @@ struct condChild {
     LE    // >=
   };
 
-  struct cond child;
+  struct Cond child;
   primary::BasePrimary *single;
 
-  expr val1;
+  Expr val1;
   Type op;
-  expr val2;
+  Expr val2;
 };
 }  // namespace parserTypes

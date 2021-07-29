@@ -27,6 +27,12 @@ parserTypes::primary::BasePrimary& parserCore::value() {
   } else if (isdigit(ch)) {
     auto ret = new parserTypes::primary::Immutable(util::toInt(iter.next()));
     return *ret;
+  } else if (iter.peekSafe(0) == L"func" && iter.peekSafe(1) == L"[") {
+    auto ret = new parserTypes::primary::FuncCall();
+    auto func = new ExecFunc;
+    *func = funcCall();
+    ret->func = func;
+    return *ret;
   } else {
     syntaxError(this, L"is not value type ", __FILE__, __func__, __LINE__);
     throw "";  // do not call this
@@ -34,7 +40,7 @@ parserTypes::primary::BasePrimary& parserCore::value() {
 }
 struct ptr parserCore::ptr() {
   assertChar("[");
-  struct expr* value = new struct expr;
+  struct Expr* value = new struct Expr;
   *value = expr();
   assertChar("]");
   return parserTypes::ptr(value);
@@ -83,14 +89,14 @@ parserTypes::primary::BasePrimary& parserCore::constant() {
 }
 primary::BasePrimary& parserCore::power() {
   if (iter.peekSafe() == L"(") {
-    primary::Inner* ret = new primary::Inner;
+    auto ret = new primary::Inner;
     // inner type
     iter.next();
-    ret->inner = expr();
+    ret->expr = expr();
     assertChar(")");
     return *ret;
   } else if (isFunccall(iter.peekSafe(), iter.peekSafe(1))) {
-    primary::FuncCall* ret = new primary::FuncCall;
+    auto ret = new primary::FuncCall;
     struct ExecFunc func = funcCall();
     ExecFunc* func2 = new ExecFunc;
     func2->args = func.args;
@@ -100,19 +106,19 @@ primary::BasePrimary& parserCore::power() {
     ret->func = func2;
     return *ret;
   } else if (isInt(iter.peekSafe())) {
-    primary::Immutable* ret = new primary::Immutable(Int());
+    auto ret = new primary::Immutable(Int());
     return *ret;
   } else if (isSingle(iter.peek()) && iter.peek() != L"[") {
-    primary::Variable* ret = new primary::Variable;
+    auto ret = new primary::Variable;
     ret->name = iter.next();
     return *ret;
   } else if (iter.peek() == L"[") {
-    primary::Pointer* ret = new primary::Pointer;
+    auto ret = new primary::Pointer;
     ret->pointer = ptr();
     return *ret;
   } else {
-    primary::Inner* ret = new primary::Inner;
-    ret->inner = expr();
+    auto ret = new primary::Inner;
+    ret->expr = expr();
     return *ret;
   }
 }
@@ -152,8 +158,8 @@ struct term parserCore::term() {
   }
   return ret;
 }
-struct expr parserCore::expr() {
-  struct expr ret;
+struct Expr parserCore::expr() {
+  struct Expr ret;
   struct term part;
   std::wstring text = iter.peek();
 
